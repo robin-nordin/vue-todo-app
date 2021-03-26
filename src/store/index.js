@@ -17,14 +17,29 @@ export default new Vuex.Store({
     actions: {
         async getTodos(ctx) {
             //get todos
-            const response = await fetch(url, { method: 'GET'}); //here we have received a promise
-            const data = await response.json;
+            const response = await fetch(url, { method: 'GET' }); //here we have received a promise
+            const data = await response.json();
             ctx.commit('updateTodos', data.todos);
         },
-        addTodo() {
+        async addTodo(ctx, newTodo) {
             //add a todo
-        }, deleteTodo() {
+            const obj = { task: newTodo };
+            const response = await fetch(url,
+                {
+                    method: 'POST',
+                    body: JSON.stringify(obj),
+                    headers: {'Content-Type': 'application/json'}
+                });
+            const data = await response.json();
+            ctx.commit('updateTodos', data.newTodo);
+        }, 
+        async deleteTodo(ctx, id) {
             //delete a todo
+            const response = await fetch(url + `/${id}`, { method: 'DELETE' });
+            const data = await response.json();
+            if (data.success) {
+                ctx.dispatch('getTodos');
+            }
         }
     }
 })
